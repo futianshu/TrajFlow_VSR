@@ -177,3 +177,28 @@ Transport diagnostics:
 
 - Stage B 主配置优先改成 `model.transport.temperature=0.1`、`model.transport.spatial_radius=2`，不默认启用 transport curriculum。
 - transport curriculum 继续作为诊断/预训练工具保留，但下一轮应尝试更短、更弱的 recovery 正则，或只在前若干 step 单独训练 transport 后丢弃该 checkpoint 作为初始化，而不是在同一 reconstruction run 中长期保留。
+
+## 2026-05-26 Stage B Mainline Quick Verification
+
+主配置已采用 `model.transport.temperature=0.1`、`model.transport.spatial_radius=2`。使用与 two-phase grid 可比的小型 GPU 设置跑 100 steps：
+
+```bash
+uv run python scripts/train.py --config configs/train/stage_b_deterministic.yaml --output-dir outputs/stage_b_mainline_lowtemp_radius2_gpu_quick --checkpoint-dir outputs/stage_b_mainline_lowtemp_radius2_gpu_quick/checkpoints --set runtime.dry_run=false --set runtime.device=cuda --set data.frames=7 --set data.height=24 --set data.width=24 --set model.hidden_channels=24 --set model.tokenizer.hidden_channels=24 --set model.uncertainty.hidden_channels=24 --set model.memory.hidden_channels=24 --set model.decoder.hidden_channels=24 --set model.transport.sinkhorn_iterations=8 --set model.transport.bridge_steps=3 --set optimizer.max_steps=100 --set checkpoint.save_final=true
+```
+
+诊断命令：
+
+```bash
+uv run python scripts/diagnose_transport.py --config configs/train/stage_b_deterministic.yaml --checkpoint outputs/stage_b_mainline_lowtemp_radius2_gpu_quick/checkpoints/final.pt --output-dir outputs/diagnostics/stage_b_mainline_lowtemp_radius2_gpu_quick --name stage_b_mainline_lowtemp_radius2 --device cpu --set data.name=controlled_motion --set data.frames=7 --set data.height=24 --set data.width=24 --set data.motion.shift_x=2 --set data.motion.shift_y=0 --set model.hidden_channels=24 --set model.tokenizer.hidden_channels=24 --set model.uncertainty.hidden_channels=24 --set model.memory.hidden_channels=24 --set model.decoder.hidden_channels=24 --set model.transport.sinkhorn_iterations=8 --set model.transport.bridge_steps=3 --set model.memory.scan_policy=ot_sb
+```
+
+结果：
+
+| checkpoint | entropy norm | top-1 mass | oracle mass | oracle cross-frame mass | top-1 oracle acc. |
+| --- | --- | --- | --- | --- | --- |
+| stage_b_mainline_lowtemp_radius2 | 0.9965 | 0.0165 | 0.0292 | 0.0169 | 0.0243 |
+
+判断：
+
+- 主线入口复现了 `lowtemp_radius2_no_curriculum_100` 的 transport 形态，说明默认配置切换生效。
+- 这一步验证的是 Stage B 主线参数回归，不代表 curriculum 成功；curriculum 仍只保留为诊断/预训练候选。
