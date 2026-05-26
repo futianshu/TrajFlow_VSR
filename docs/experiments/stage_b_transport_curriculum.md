@@ -126,3 +126,54 @@ uv run python scripts/run_ablation.py --config configs/ablation/stage_b_transpor
 - 前 10 或 25 steps 用 `temperature=0.1`、`spatial_radius=2`、motion-supervised transport 和 entropy schedule 学尖锐 plan。
 - warmup 结束后解冻 decoder/consistency，并恢复 reconstruction/data-consistency 主目标。
 - `light_recovery` variants 在恢复阶段保留很弱的 motion/entropy 正则并线性衰减到 0，检查是否能保住 plan 形状而不继续压低 PSNR。
+
+## 2026-05-26 Two-Phase GPU Run
+
+运行命令：
+
+```bash
+uv run python scripts/run_ablation.py --config configs/ablation/stage_b_transport_two_phase_grid.yaml --output-dir outputs/ablations/stage_b_transport_two_phase_grid_gpu --set runtime.dry_run=false --set runtime.device=cuda
+```
+
+结果文件：
+
+- `outputs/ablations/stage_b_transport_two_phase_grid_gpu/comparison.md`
+- `outputs/ablations/stage_b_transport_two_phase_grid_gpu/summary.json`
+- `outputs/diagnostics/stage_b_transport_two_phase_grid_gpu/*.json`
+
+Reconstruction / efficiency ranking:
+
+| rank | variant | PSNR | SSIM | tOF / temporal delta | FPS | selection |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | lowtemp_radius2_no_curriculum_100 | 16.5601 | 0.4914 | 0.1305 | 520.7 | 0.9761 |
+| 2 | ot_sb_no_curriculum_100 | 16.5100 | 0.4880 | 0.1312 | 523.3 | 0.8370 |
+| 3 | two_phase25_hard_light_recovery | 16.3343 | 0.4825 | 0.1302 | 500.4 | 0.5612 |
+| 4 | two_phase25_topk_light_recovery | 16.3459 | 0.4817 | 0.1303 | 462.3 | 0.4951 |
+| 5 | two_phase25_light_recovery | 16.3202 | 0.4785 | 0.1311 | 520.5 | 0.4711 |
+| 6 | two_phase10_lowtemp_radius2 | 16.4055 | 0.4773 | 0.1332 | 521.1 | 0.4499 |
+| 7 | two_phase25_lowtemp_radius2 | 16.2472 | 0.4677 | 0.1338 | 518.3 | 0.0917 |
+
+Transport diagnostics:
+
+| variant | entropy norm | top-1 mass | oracle mass | oracle cross-frame mass | top-1 oracle acc. |
+| --- | --- | --- | --- | --- | --- |
+| ot_sb_no_curriculum_100 | 0.9966 | 0.0064 | 0.0146 | 0.0102 | 0.0201 |
+| lowtemp_radius2_no_curriculum_100 | 0.9966 | 0.0164 | 0.0296 | 0.0170 | 0.0295 |
+| two_phase10_lowtemp_radius2 | 0.9966 | 0.0164 | 0.0295 | 0.0171 | 0.0288 |
+| two_phase25_lowtemp_radius2 | 0.9956 | 0.0170 | 0.0309 | 0.0176 | 0.0481 |
+| two_phase25_light_recovery | 0.9878 | 0.0202 | 0.0381 | 0.0211 | 0.1394 |
+| two_phase25_topk_light_recovery | 0.9875 | 0.0203 | 0.0383 | 0.0212 | 0.1429 |
+| two_phase25_hard_light_recovery | 0.9857 | 0.0208 | 0.0395 | 0.0219 | 0.1503 |
+
+判断：
+
+- 最强 reconstruction 配置不是 two-phase，而是直接使用 `temperature=0.1` + `spatial_radius=2` 的 `lowtemp_radius2_no_curriculum_100`：PSNR/SSIM/tOF 都优于 100-step 默认 `ot_sb` baseline。
+- 低温小半径主要带来更局部、更尖的候选分布，而不是强 oracle 对齐：top-1 mass 从 `0.0064` 到 `0.0164`，oracle mass 从 `0.0146` 到 `0.0296`，但 top-1 oracle accuracy 只有 `0.0295`。
+- two-phase warmup 后如果直接回 base loss，oracle 偏置会大幅回落；25-step warmup 比 10-step 稍强，但 reconstruction 稍差。
+- `light_recovery` 能保住更多 motion supervision 痕迹：top-1 oracle accuracy 到 `0.139-0.150`，但 PSNR 仍低于无 curriculum 的低温小半径配置。
+- hard/top-k 在 light recovery 下主要提升 transport 诊断和 temporal delta，但 FPS 或 PSNR 有轻微代价。
+
+当前建议：
+
+- Stage B 主配置优先改成 `model.transport.temperature=0.1`、`model.transport.spatial_radius=2`，不默认启用 transport curriculum。
+- transport curriculum 继续作为诊断/预训练工具保留，但下一轮应尝试更短、更弱的 recovery 正则，或只在前若干 step 单独训练 transport 后丢弃该 checkpoint 作为初始化，而不是在同一 reconstruction run 中长期保留。

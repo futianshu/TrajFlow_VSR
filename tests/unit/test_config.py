@@ -33,6 +33,12 @@ data:
         self.assertEqual(config["stage"]["name"], "stage_a_tokenizer")
         self.assertEqual(config["model"]["name"], "trajflow_vsr")
 
+    def test_stage_b_default_transport_uses_low_temperature_local_radius(self):
+        config = load_config("configs/train/stage_b_deterministic.yaml")
+        self.assertEqual(config["stage"]["name"], "stage_b_deterministic")
+        self.assertEqual(config["model"]["transport"]["temperature"], 0.1)
+        self.assertEqual(config["model"]["transport"]["spatial_radius"], 2)
+
     def test_load_stage_b_frame_manifest_full_config(self):
         config = load_config("configs/train/stage_b_frame_manifest_full.yaml")
         self.assertEqual(config["stage"]["name"], "stage_b_deterministic")

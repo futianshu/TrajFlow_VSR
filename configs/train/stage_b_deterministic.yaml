@@ -29,11 +29,11 @@ model:
     hidden_channels: 48
     degradation_dim: 8
   transport:
-    temperature: 0.2
+    temperature: 0.1
     sinkhorn_iterations: 12
     unbalanced_floor: 0.05
     bridge_steps: 3
-    spatial_radius: 4
+    spatial_radius: 2
     temporal_radius: 2
   memory:
     hidden_channels: 48
