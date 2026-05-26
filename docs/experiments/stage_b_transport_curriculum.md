@@ -202,3 +202,39 @@ uv run python scripts/diagnose_transport.py --config configs/train/stage_b_deter
 
 - 主线入口复现了 `lowtemp_radius2_no_curriculum_100` 的 transport 形态，说明默认配置切换生效。
 - 这一步验证的是 Stage B 主线参数回归，不代表 curriculum 成功；curriculum 仍只保留为诊断/预训练候选。
+
+## 2026-05-26 Stage A Pretrained Transfer Quick Check
+
+先用同一小型 GPU 设置训练 100-step Stage A tokenizer/uncertainty checkpoint：
+
+```bash
+uv run python scripts/train.py --config configs/train/stage_a_tokenizer.yaml --output-dir outputs/stage_a_tokenizer_gpu_pretrain_quick --checkpoint-dir outputs/stage_a_tokenizer_gpu_pretrain_quick/checkpoints --set runtime.dry_run=false --set runtime.device=cuda --set data.frames=7 --set data.height=24 --set data.width=24 --set model.hidden_channels=24 --set model.tokenizer.hidden_channels=24 --set model.uncertainty.hidden_channels=24 --set optimizer.max_steps=100 --set checkpoint.save_final=true
+```
+
+然后比较两种 Stage B transfer：
+
+- `stage_b_pretrained_frozen_gpu_quick`: 加载 Stage A tokenizer/uncertainty 并冻结。
+- `stage_b_pretrained_finetune_gpu_quick`: 加载 Stage A tokenizer/uncertainty 后继续 fine-tune。
+
+Stage B 训练结果：
+
+| run | pretrained keys | frozen | final total | final charbonnier | final OT | final Koopman |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| scratch mainline | 0 | no | 0.2481 | 0.1346 | 0.3694 | 0.5798 |
+| pretrained frozen | 20 | yes | 0.2980 | 0.1475 | 1.3520 | 0.8360 |
+| pretrained fine-tune | 20 | no | 0.2473 | 0.1343 | 0.3810 | 0.5603 |
+
+Controlled-motion transport diagnostics:
+
+| run | entropy norm | top-1 mass | oracle mass | oracle cross-frame mass | top-1 oracle acc. |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| scratch mainline | 0.9965 | 0.0165 | 0.0292 | 0.0169 | 0.0243 |
+| pretrained frozen | 0.9951 | 0.0178 | 0.0300 | 0.0170 | 0.0305 |
+| pretrained fine-tune | 0.9967 | 0.0164 | 0.0294 | 0.0171 | 0.0203 |
+
+判断：
+
+- 预训练加载链路有效：Stage B 成功加载 `20` 个 tokenizer/uncertainty 参数，没有 shape mismatch。
+- 冻结 100-step synthetic Stage A 表征会伤害 Stage B reconstruction；虽然 transport diagnostic 略好，但 final total/charbonnier/OT/Koopman 都差于 scratch。
+- 加载后 fine-tune 能把 reconstruction loss 恢复到 scratch 水平，final total 从 `0.2481` 到 `0.2473`，但 controlled-motion top-1 oracle accuracy 没有提升。
+- 当前不建议把 `freeze_components=["tokenizer", "uncertainty"]` 作为 quick/default Stage B 设置；更稳妥的是只加载并 fine-tune，或等 Stage A 在真实/更长数据上充分预训练后再重新评估冻结策略。
