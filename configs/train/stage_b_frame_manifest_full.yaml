@@ -1,0 +1,95 @@
+project:
+  name: trajflow-vsr
+  experiment: stage_b_frame_manifest_full
+  output_dir: outputs/stage_b_frame_manifest_full
+stage:
+  name: stage_b_deterministic
+  mode: offline
+  objective: full_frame_manifest_ot_sb_koopman_operator_training
+runtime:
+  seed: 20260524
+  device: cpu
+  dry_run: true
+data:
+  name: frame_manifest
+  manifest_path: data/splits/YOUR_DATASET_train_manifest.json
+  layout: generic
+  require_paired: true
+  batch_size: 1
+  frames: 7
+  channels: 3
+  scale: 4.0
+  clip_index: 0
+  clip_stride: 1
+  sample_sequential_clips: true
+model:
+  name: trajflow_vsr
+  in_channels: 3
+  out_channels: 3
+  hidden_channels: 64
+  tokenizer:
+    hidden_channels: 64
+  uncertainty:
+    hidden_channels: 64
+    degradation_dim: 8
+  transport:
+    temperature: 0.18
+    sinkhorn_iterations: 24
+    unbalanced_floor: 0.08
+    bridge_steps: 4
+    spatial_radius: 6
+    temporal_radius: 3
+  memory:
+    hidden_channels: 64
+    scan_policy: ot_sb
+    use_koopman: true
+  flow:
+    hidden_channels: 64
+    enabled: false
+    teacher_steps: 2
+  decoder:
+    hidden_channels: 64
+  consistency:
+    strength: 0.25
+  pretrained:
+    path: checkpoints/stage_a_tokenizer/final.pt
+    components: ["tokenizer", "uncertainty"]
+    freeze_components: []
+    strict: false
+losses:
+  charbonnier: 1.0
+  optimal_transport: 0.03
+  schrodinger_bridge: 0.02
+  koopman: 0.05
+  flow_matching: 0.0
+  data_consistency: 0.25
+  temporal: 0.15
+  wavelet_frequency: 0.12
+  anti_aliasing: 0.02
+  trajectory: 0.03
+  uncertainty: 0.02
+optimizer:
+  name: adamw
+  lr: 0.0001
+  weight_decay: 0.0001
+  max_steps: 100000
+  gradient_accumulation_steps: 2
+  max_grad_norm: 1.0
+  amp: true
+scheduler:
+  name: cosine
+  eta_min: 0.000001
+checkpoint:
+  output_dir: checkpoints/stage_b_frame_manifest_full
+  resume_path: null
+  save_every_steps: 1000
+  save_final: true
+  save_history: true
+validation:
+  enabled: true
+  config: configs/eval/frame_manifest.yaml
+  every_steps: 1000
+  metric: psnr
+  direction: max
+  mode: offline
+  overrides: ["data.manifest_path=data/splits/YOUR_DATASET_val_manifest.json", "evaluation.clip_count=4", "evaluation.save_results=true"]

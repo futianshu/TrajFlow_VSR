@@ -1,0 +1,13 @@
+data:
+  name: frame_manifest
+  manifest_path: data/splits/train_manifest.json
+  layout: generic
+  batch_size: 1
+  frames: 5
+  channels: 3
+  height: 24
+  width: 24
+  hr_height: null
+  hr_width: null
+  scale: 2.0
+  clip_index: 0

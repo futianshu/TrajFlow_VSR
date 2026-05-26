@@ -1,0 +1,26 @@
+prepare:
+  root: data/raw/vimeo90k
+  output: data/splits/vimeo90k_train_manifest.json
+  dataset: vimeo90k
+  split: train
+  layout: vimeo90k
+  split_file: sep_trainlist.txt
+  hr_root: null
+  hr_layout: null
+  hr_split_file: null
+  clip_length: 7
+  stride: 1
+  min_frames: 7
+data:
+  name: frame_manifest
+  manifest_path: data/splits/vimeo90k_train_manifest.json
+  layout: vimeo90k
+  batch_size: 1
+  frames: 7
+  channels: 3
+  height: 64
+  width: 64
+  hr_height: null
+  hr_width: null
+  scale: 4.0
+  clip_index: 0

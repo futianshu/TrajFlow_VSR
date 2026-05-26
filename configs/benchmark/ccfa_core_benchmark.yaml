@@ -1,0 +1,79 @@
+benchmark:
+  name: ccfa_core_benchmark
+  purpose: fixed_protocol_matrix_for_ccfa_vsr_quality_temporal_efficiency_uncertainty
+  output_dir: outputs/benchmark_plans/ccfa_core_benchmark
+  metrics_root: experiments/benchmark_metrics/ccfa_core
+  metrics: ["psnr", "ssim", "temporal_delta_error", "tof", "lpips", "dists", "vmaf", "uncertainty_error_correlation", "reliability_ece", "selective_reconstruction_auc", "fps", "latency_seconds", "megapixels_per_second", "vram_gb", "macs", "gmacs"]
+  methods:
+    trajflow_stage_b:
+      display_name: TrajFlow-VSR Stage-B
+      kind: internal
+      eval_config: configs/eval/frame_manifest.yaml
+      checkpoint_path: checkpoints/stage_b_deterministic/final.pt
+      overrides: ["model.hidden_channels=48"]
+    basicvsrpp:
+      display_name: BasicVSR++
+      kind: baseline
+      registry_id: basicvsrpp
+    realbasicvsr:
+      display_name: RealBasicVSR
+      kind: baseline
+      registry_id: realbasicvsr
+    realviformer:
+      display_name: RealViformer
+      kind: baseline
+      registry_id: realviformer
+    vsrm:
+      display_name: VSRM
+      kind: baseline
+      registry_id: vsrm
+    diffvsr:
+      display_name: DiffVSR
+      kind: baseline
+      registry_id: diffvsr
+  datasets:
+    vid4:
+      split: test
+      overrides: ["data.name=frame_manifest", "data.manifest_path=data/splits/vid4_test_manifest.json", "evaluation.clip_count=4"]
+    udm10:
+      split: test
+      overrides: ["data.name=frame_manifest", "data.manifest_path=data/splits/udm10_test_manifest.json", "evaluation.clip_count=10"]
+    reds4:
+      split: val
+      overrides: ["data.name=frame_manifest", "data.manifest_path=data/splits/reds4_val_manifest.json", "evaluation.clip_count=4"]
+    spmcs:
+      split: test
+      overrides: ["data.name=frame_manifest", "data.manifest_path=data/splits/spmcs_bix4_test_manifest.json", "data.frames=31", "evaluation.clip_count=30"]
+    realvsr:
+      split: test
+      overrides: ["data.name=frame_manifest", "data.manifest_path=data/splits/realvsr_test_manifest.json", "data.frames=50", "evaluation.clip_count=50"]
+  degradations:
+    synthetic:
+      family: synthetic
+      overrides: ["data.degradation.profile=synthetic"]
+    mild_real:
+      family: realistic
+      overrides: ["data.degradation.profile=mild_real"]
+    codec_motion:
+      family: codec
+      overrides: ["data.degradation.profile=codec_motion"]
+  scales:
+    x2:
+      value: 2
+      overrides: ["data.scale=2"]
+    x3:
+      value: 3
+      overrides: ["data.scale=3"]
+    x4:
+      value: 4
+      overrides: ["data.scale=4"]
+    x6:
+      value: 6
+      overrides: ["data.scale=6"]
+  protocols:
+    offline:
+      eval_config: configs/eval/frame_manifest.yaml
+      overrides: ["evaluation.mode=offline"]
+    streaming:
+      eval_config: configs/eval/streaming.yaml
+      overrides: ["evaluation.mode=streaming"]

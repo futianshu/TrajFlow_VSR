@@ -1,0 +1,28 @@
+degradation:
+  profile: mild_real
+  scale: 4.0
+  blur_strength: 0.25
+  noise_std: 0.015
+  codec_strength: 0.2
+  motion_strength: 0.1
+  exposure: 1.0
+  block_size: 4
+prepare:
+  hr_root: data/raw/YOUR_HR_ROOT
+  lr_output_root: data/processed/YOUR_DATASET_mild_real_x4
+  manifest_output: data/splits/YOUR_DATASET_mild_real_x4_train_manifest.json
+  dataset: custom
+  split: train
+  layout: generic
+  clip_length: 5
+  stride: 1
+  min_frames: 5
+data:
+  name: frame_manifest
+  manifest_path: data/splits/YOUR_DATASET_mild_real_x4_train_manifest.json
+  layout: generic
+  batch_size: 1
+  frames: 5
+  channels: 3
+  scale: 4.0
+  clip_index: 0

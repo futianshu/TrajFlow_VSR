@@ -1,0 +1,26 @@
+prepare:
+  root: /home/ubuntu/data/OpenDataLab___SPMCS/raw/SPMCS/BIx4
+  output: data/splits/spmcs_bix4_test_manifest.json
+  dataset: spmcs
+  split: test
+  layout: generic
+  hr_root: /home/ubuntu/data/OpenDataLab___SPMCS/raw/SPMCS/GT
+  hr_layout: generic
+  hr_split_file: null
+  clip_length: 31
+  stride: 31
+  min_frames: 31
+data:
+  name: frame_manifest
+  manifest_path: data/splits/spmcs_bix4_test_manifest.json
+  layout: generic
+  batch_size: 1
+  frames: 31
+  channels: 3
+  hr_height: null
+  hr_width: null
+  scale: 4.0
+  clip_index: 0
+alternates:
+  bdx4_manifest_path: data/splits/spmcs_bdx4_test_manifest.json
+  bdx4_root: /home/ubuntu/data/OpenDataLab___SPMCS/raw/SPMCS/BDx4

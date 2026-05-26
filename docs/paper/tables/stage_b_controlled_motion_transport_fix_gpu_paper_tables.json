@@ -1,0 +1,7 @@
+{
+  "output_dir": "docs/paper/tables",
+  "files": {
+    "ranking_markdown": "docs/paper/tables/stage_b_controlled_motion_transport_fix_gpu_ranking.md",
+    "ranking_latex": "docs/paper/tables/stage_b_controlled_motion_transport_fix_gpu_ranking.tex"
+  }
+}

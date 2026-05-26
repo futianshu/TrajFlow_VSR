@@ -1,0 +1,86 @@
+project:
+  name: trajflow-vsr
+  experiment: stage_e_streaming_smoke
+  output_dir: outputs/stage_e_streaming
+stage:
+  name: stage_e_streaming
+  mode: mixed
+  objective: offline_streaming_joint_training
+runtime:
+  seed: 20260524
+  device: cpu
+  dry_run: true
+data:
+  name: synthetic
+  batch_size: 1
+  frames: 4
+  channels: 3
+  height: 20
+  width: 20
+  scale: 2.0
+model:
+  name: trajflow_vsr
+  in_channels: 3
+  out_channels: 3
+  hidden_channels: 48
+  tokenizer:
+    hidden_channels: 48
+  uncertainty:
+    hidden_channels: 48
+    degradation_dim: 8
+  transport:
+    temperature: 0.2
+    sinkhorn_iterations: 12
+    unbalanced_floor: 0.05
+    bridge_steps: 3
+    spatial_radius: 4
+    temporal_radius: 2
+  memory:
+    hidden_channels: 48
+    scan_policy: ot_sb
+    use_koopman: true
+  flow:
+    hidden_channels: 48
+    enabled: true
+    gate_max: 0.25
+    amplitude_limit: 0.25
+    bandlimit_kernel_size: 3
+    teacher_steps: 2
+  decoder:
+    hidden_channels: 48
+  consistency:
+    strength: 0.2
+  pretrained:
+    path: null
+    components: ["tokenizer", "uncertainty"]
+    freeze_components: ["tokenizer", "uncertainty"]
+    strict: false
+losses:
+  charbonnier: 0.25
+  optimal_transport: 0.005
+  schrodinger_bridge: 0.005
+  koopman: 0.01
+  flow_matching: 0.2
+  bridge_consistency: 0.05
+  residual_amplitude: 0.05
+  residual_low_frequency: 0.1
+  distillation: 0.5
+  teacher_target: 0.05
+  streaming_causality: 1.0
+  data_consistency: 0.2
+  temporal: 0.1
+  wavelet_frequency: 0.1
+  anti_aliasing: 0.01
+  trajectory: 0.005
+  uncertainty: 0.05
+optimizer:
+  name: adamw
+  lr: 0.0001
+  weight_decay: 0.0001
+  max_steps: 2
+checkpoint:
+  output_dir: checkpoints/stage_e_streaming
+  resume_path: null
+  save_every_steps: 0
+  save_final: false
+  save_history: true

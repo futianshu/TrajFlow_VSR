@@ -1,0 +1,27 @@
+base_config: configs/train/stage_e_streaming.yaml
+ablation:
+  name: stage_e_protocol_grid
+  purpose: compare_offline_streaming_and_joint_modes_for_online_vsr_claims
+  metric_focus: ["psnr", "ssim", "temporal_delta_error", "causal_violation", "fps", "latency_seconds"]
+  evaluation_config: configs/eval/streaming.yaml
+  common_overrides: ["checkpoint.save_final=true"]
+  evaluation_overrides: ["evaluation.save_results=true"]
+  selection:
+    mode: streaming
+    metrics: ["psnr", "ssim", "temporal_delta_error", "causal_violation", "fps"]
+    directions:
+      psnr: max
+      ssim: max
+      temporal_delta_error: min
+      causal_violation: min
+      fps: max
+    weights:
+      psnr: 0.25
+      ssim: 0.15
+      temporal_delta_error: 0.25
+      causal_violation: 0.20
+      fps: 0.15
+  variants:
+    offline_only: ["stage.mode=offline"]
+    streaming_only: ["stage.mode=online_causal"]
+    mixed_offline_streaming: ["stage.mode=mixed"]

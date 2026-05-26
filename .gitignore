@@ -1,0 +1,67 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# OS / editor noise
+.DS_Store
+*.swp
+*.swo
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+
+# Python tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local environment files
+.env
+.env.*
+
+# Local agent/tool state
+.codex/
+.agents/
+
+# Large datasets and generated artifacts
+data/raw/*
+data/interim/*
+data/processed/*
+data/external/*
+data/degradation/*
+checkpoints/*
+outputs/*
+logs/*
+wandb/
+mlruns/
+*.log
+
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+!data/external/.gitkeep
+!data/degradation/.gitkeep
+!checkpoints/.gitkeep
+!outputs/.gitkeep
+!logs/.gitkeep
+
+# Large generated manifests. Keep compact benchmark/test manifests tracked.
+data/splits/*_train_manifest.json
+
+# Model weights and media dumps
+*.ckpt
+*.pth
+*.pt
+*.safetensors
+*.onnx
+*.mp4
+*.mov
+*.avi
+*.mkv

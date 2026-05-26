@@ -1,0 +1,25 @@
+prepare:
+  root: /home/ubuntu/data/VideoLQ/Input
+  output: data/splits/videolq_real_test_manifest.json
+  dataset: videolq
+  split: real_test
+  layout: generic
+  hr_root: null
+  hr_layout: null
+  hr_split_file: null
+  clip_length: 0
+  stride: 1
+  min_frames: 1
+data:
+  name: frame_manifest
+  manifest_path: data/splits/videolq_real_test_manifest.json
+  layout: generic
+  batch_size: 1
+  frames: 0
+  channels: 3
+  hr_height: null
+  hr_width: null
+  scale: 4.0
+  clip_index: 0
+  paired: false
+  protocol: no_reference_qualitative

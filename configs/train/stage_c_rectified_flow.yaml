@@ -1,0 +1,82 @@
+project:
+  name: trajflow-vsr
+  experiment: stage_c_rectified_flow_smoke
+  output_dir: outputs/stage_c_rectified_flow
+stage:
+  name: stage_c_rectified_flow
+  mode: offline
+  objective: conditional_rectified_flow_residual_training
+runtime:
+  seed: 20260524
+  device: cpu
+  dry_run: true
+data:
+  name: synthetic
+  batch_size: 1
+  frames: 4
+  channels: 3
+  height: 20
+  width: 20
+  scale: 2.0
+model:
+  name: trajflow_vsr
+  in_channels: 3
+  out_channels: 3
+  hidden_channels: 48
+  tokenizer:
+    hidden_channels: 48
+  uncertainty:
+    hidden_channels: 48
+    degradation_dim: 8
+  transport:
+    temperature: 0.2
+    sinkhorn_iterations: 12
+    unbalanced_floor: 0.05
+    bridge_steps: 3
+    spatial_radius: 4
+    temporal_radius: 2
+  memory:
+    hidden_channels: 48
+    scan_policy: ot_sb
+    use_koopman: true
+  flow:
+    hidden_channels: 48
+    enabled: true
+    gate_max: 0.25
+    amplitude_limit: 0.25
+    bandlimit_kernel_size: 3
+  decoder:
+    hidden_channels: 48
+  consistency:
+    strength: 0.2
+  pretrained:
+    path: null
+    components: ["tokenizer", "uncertainty"]
+    freeze_components: ["tokenizer", "uncertainty"]
+    strict: false
+losses:
+  charbonnier: 0.5
+  optimal_transport: 0.01
+  schrodinger_bridge: 0.01
+  koopman: 0.02
+  flow_matching: 1.0
+  bridge_consistency: 0.1
+  residual_amplitude: 0.05
+  residual_low_frequency: 0.1
+  data_consistency: 0.2
+  temporal: 0.1
+  wavelet_frequency: 0.1
+  anti_aliasing: 0.01
+  trajectory: 0.01
+  uncertainty: 0.05
+optimizer:
+  name: adamw
+  lr: 0.0001
+  weight_decay: 0.0001
+  max_steps: 1
+checkpoint:
+  output_dir: checkpoints/stage_c_rectified_flow
+  resume_path: null
+  save_every_steps: 0
+  save_final: false
+  save_history: true

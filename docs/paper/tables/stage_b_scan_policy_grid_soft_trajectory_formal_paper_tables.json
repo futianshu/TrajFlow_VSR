@@ -1,0 +1,7 @@
+{
+  "output_dir": "docs/paper/tables",
+  "files": {
+    "ranking_markdown": "docs/paper/tables/stage_b_scan_policy_grid_soft_trajectory_formal_ranking.md",
+    "ranking_latex": "docs/paper/tables/stage_b_scan_policy_grid_soft_trajectory_formal_ranking.tex"
+  }
+}

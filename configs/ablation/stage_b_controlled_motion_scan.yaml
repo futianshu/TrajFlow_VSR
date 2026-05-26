@@ -1,0 +1,31 @@
+base_config: configs/train/stage_b_deterministic.yaml
+ablation:
+  name: stage_b_controlled_motion_scan
+  purpose: sanity_check_ot_sb_against_temporal_on_known_integer_translation
+  metric_focus: ["psnr", "ssim", "temporal_delta_error", "fps", "latency_seconds", "memory"]
+  evaluation_config: configs/eval/offline.yaml
+  common_overrides: ["checkpoint.save_final=true", "data.name=controlled_motion", "data.motion.shift_x=2", "data.motion.shift_y=0", "data.motion.wrap=true", "data.motion.noise=0.0", "data.motion.occlusion_size=0"]
+  evaluation_overrides: ["evaluation.save_results=true", "data.name=controlled_motion", "data.motion.shift_x=2", "data.motion.shift_y=0", "data.motion.wrap=true", "data.motion.noise=0.0", "data.motion.occlusion_size=0"]
+  selection:
+    mode: offline
+    metrics: ["psnr", "ssim", "temporal_delta_error", "fps"]
+    directions:
+      psnr: max
+      ssim: max
+      temporal_delta_error: min
+      fps: max
+    weights:
+      psnr: 0.4
+      ssim: 0.3
+      temporal_delta_error: 0.2
+      fps: 0.1
+  variants:
+    temporal: ["model.memory.scan_policy=temporal", "model.memory.use_koopman=true"]
+    bridge_temporal: ["model.memory.scan_policy=bridge_temporal", "model.memory.use_koopman=true"]
+    ot_sb: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true"]
+    ot_sb_topk: ["model.memory.scan_policy=ot_sb_topk", "model.memory.trajectory_topk=4", "model.memory.use_koopman=true"]
+    ot_sb_hard: ["model.memory.scan_policy=ot_sb_hard", "model.memory.use_koopman=true"]
+    ot_sb_no_koopman: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=false", "losses.koopman=0.0"]
+    ot_sb_supervised: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true", "losses.motion_transport=0.5", "losses.transport_entropy=0.02"]
+    ot_sb_topk_supervised: ["model.memory.scan_policy=ot_sb_topk", "model.memory.trajectory_topk=4", "model.memory.use_koopman=true", "losses.motion_transport=0.5", "losses.transport_entropy=0.02"]
+    ot_sb_hard_supervised: ["model.memory.scan_policy=ot_sb_hard", "model.memory.use_koopman=true", "losses.motion_transport=0.5", "losses.transport_entropy=0.02"]

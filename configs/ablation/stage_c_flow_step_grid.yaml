@@ -1,0 +1,32 @@
+base_config: configs/train/stage_c_rectified_flow.yaml
+ablation:
+  name: stage_c_flow_step_grid
+  purpose: compare_deterministic_residual_and_rectified_flow_one_two_four_step_sampling
+  metric_focus: ["psnr", "ssim", "temporal_delta_error", "tof", "lpips", "dists", "posterior_variance", "fps"]
+  evaluation_config: configs/eval/offline.yaml
+  common_overrides: ["checkpoint.save_final=true"]
+  evaluation_overrides: ["evaluation.save_results=true", "evaluation.posterior_samples=2"]
+  selection:
+    mode: offline
+    metrics: ["psnr", "ssim", "temporal_delta_error", "tof", "lpips", "dists", "fps"]
+    directions:
+      psnr: max
+      ssim: max
+      temporal_delta_error: min
+      tof: min
+      lpips: min
+      dists: min
+      fps: max
+    weights:
+      psnr: 0.25
+      ssim: 0.15
+      temporal_delta_error: 0.20
+      tof: 0.10
+      lpips: 0.15
+      dists: 0.10
+      fps: 0.10
+  variants:
+    deterministic_no_flow: ["model.flow.enabled=false", "losses.flow_matching=0.0", "losses.bridge_consistency=0.0"]
+    flow_one_step: ["model.flow.enabled=true", "model.flow.teacher_steps=1"]
+    flow_two_step: ["model.flow.enabled=true", "model.flow.teacher_steps=2"]
+    flow_four_step: ["model.flow.enabled=true", "model.flow.teacher_steps=4"]

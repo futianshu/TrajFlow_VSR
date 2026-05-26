@@ -1,0 +1,34 @@
+base_config: configs/train/stage_b_deterministic.yaml
+ablation:
+  name: stage_b_core_module_grid
+  purpose: verify_each_deterministic_transport_operator_component_required_by_proposal
+  metric_focus: ["psnr", "ssim", "temporal_delta_error", "tof", "reliability_ece", "fps"]
+  evaluation_config: configs/eval/offline.yaml
+  common_overrides: ["checkpoint.save_final=true"]
+  evaluation_overrides: ["evaluation.save_results=true"]
+  selection:
+    mode: offline
+    metrics: ["psnr", "ssim", "temporal_delta_error", "tof", "reliability_ece", "fps"]
+    directions:
+      psnr: max
+      ssim: max
+      temporal_delta_error: min
+      tof: min
+      reliability_ece: min
+      fps: max
+    weights:
+      psnr: 0.30
+      ssim: 0.20
+      temporal_delta_error: 0.18
+      tof: 0.12
+      reliability_ece: 0.12
+      fps: 0.08
+  variants:
+    full: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true"]
+    w_o_ot_sb_bridge: ["model.memory.scan_policy=temporal", "model.transport.use_reliability=false", "losses.optimal_transport=0.0", "losses.schrodinger_bridge=0.0", "losses.trajectory=0.0"]
+    w_o_unbalanced_ot: ["model.transport.use_unbalanced=false", "model.transport.unbalanced_floor=0.0"]
+    w_o_koopman: ["model.memory.use_koopman=false", "losses.koopman=0.0"]
+    w_o_reliability_calibration: ["model.transport.use_reliability=false", "model.consistency.strength=0.0", "losses.uncertainty=0.0"]
+    w_o_wavelet_anti_aliasing: ["model.decoder.use_wavelet=false", "model.decoder.use_anti_aliasing=false", "losses.wavelet_frequency=0.0", "losses.anti_aliasing=0.0"]
+    w_o_neural_operator: ["model.decoder.use_operator=false", "model.decoder.use_fourier=false", "model.decoder.use_wavelet=false", "losses.wavelet_frequency=0.0"]
+    w_o_data_consistency: ["model.consistency.strength=0.0", "losses.data_consistency=0.0"]

@@ -1,0 +1,56 @@
+project:
+  name: trajflow-vsr
+  experiment: eval_frame_manifest
+  output_dir: outputs/eval_frame_manifest
+runtime:
+  seed: 20260524
+  device: cpu
+  dry_run: true
+data:
+  name: frame_manifest
+  manifest_path: data/splits/YOUR_DATASET_test_manifest.json
+  layout: generic
+  batch_size: 1
+  frames: 5
+  channels: 3
+  scale: 4.0
+  clip_index: 0
+model:
+  name: trajflow_vsr
+  in_channels: 3
+  out_channels: 3
+  hidden_channels: 48
+  tokenizer:
+    hidden_channels: 48
+  uncertainty:
+    hidden_channels: 48
+    degradation_dim: 8
+  transport:
+    temperature: 0.2
+    sinkhorn_iterations: 12
+    unbalanced_floor: 0.05
+    bridge_steps: 3
+    spatial_radius: 4
+    temporal_radius: 2
+  memory:
+    hidden_channels: 48
+    scan_policy: ot_sb
+    use_koopman: true
+  flow:
+    hidden_channels: 48
+    teacher_steps: 2
+  decoder:
+    hidden_channels: 48
+  consistency:
+    strength: 0.2
+evaluation:
+  name: frame_manifest_offline_protocol
+  mode: offline
+  clip_count: 1
+  checkpoint_path: null
+  save_results: true
+  metric_backend: proxy
+  profile_macs: true
+  posterior_samples: 0
+  official_metric_candidates: ["lpips", "dists", "niqe", "musiq", "clipiqa", "vmaf", "fvd"]
+  metrics: ["psnr", "ssim", "temporal_delta_error", "tof", "lpips", "dists", "uncertainty_error_correlation", "reliability_ece", "selective_reconstruction_auc", "causal_violation", "latency_seconds", "fps", "megapixels_per_second", "vram_gb"]

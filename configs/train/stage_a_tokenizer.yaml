@@ -1,0 +1,64 @@
+project:
+  name: trajflow-vsr
+  experiment: stage_a_tokenizer_smoke
+  output_dir: outputs/stage_a_tokenizer
+stage:
+  name: stage_a_tokenizer
+  mode: offline
+  objective: degradation_and_token_pretraining
+runtime:
+  seed: 20260524
+  device: cpu
+  dry_run: true
+data:
+  name: synthetic
+  batch_size: 1
+  frames: 3
+  channels: 3
+  height: 24
+  width: 24
+  scale: 2.0
+  degradation:
+    blur_max: 0.75
+    noise_max: 0.08
+    codec_max: 0.65
+    motion_max: 0.45
+    exposure_min: 0.75
+    exposure_max: 1.25
+    block_size: 4
+model:
+  name: trajflow_vsr
+  in_channels: 3
+  out_channels: 3
+  hidden_channels: 32
+  mask_ratio: 0.25
+  tokenizer:
+    hidden_channels: 32
+  uncertainty:
+    hidden_channels: 32
+    degradation_dim: 8
+  transport:
+    temperature: 0.25
+  consistency:
+    strength: 0.15
+losses:
+  masked_reconstruction: 1.0
+  degradation: 0.5
+  artifact: 0.25
+  reliability: 0.1
+  charbonnier: 0.0
+  koopman: 0.0
+  flow_matching: 0.0
+  data_consistency: 0.1
+  uncertainty: 0.1
+optimizer:
+  name: adamw
+  lr: 0.0001
+  weight_decay: 0.0
+  max_steps: 1
+checkpoint:
+  output_dir: checkpoints/stage_a_tokenizer
+  resume_path: null
+  save_every_steps: 0
+  save_final: false
+  save_history: true

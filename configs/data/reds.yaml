@@ -1,0 +1,25 @@
+prepare:
+  root: data/raw/REDS
+  output: data/splits/reds_train_manifest.json
+  dataset: reds
+  split: train
+  layout: reds
+  hr_root: null
+  hr_layout: null
+  hr_split_file: null
+  clip_length: 15
+  stride: 5
+  min_frames: 15
+data:
+  name: frame_manifest
+  manifest_path: data/splits/reds_train_manifest.json
+  layout: reds
+  batch_size: 1
+  frames: 15
+  channels: 3
+  height: 64
+  width: 64
+  hr_height: null
+  hr_width: null
+  scale: 4.0
+  clip_index: 0

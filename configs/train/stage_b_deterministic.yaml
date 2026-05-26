@@ -1,0 +1,73 @@
+project:
+  name: trajflow-vsr
+  experiment: stage_b_deterministic_smoke
+  output_dir: outputs/stage_b_deterministic
+stage:
+  name: stage_b_deterministic
+  mode: offline
+  objective: ot_sb_trajectory_koopman_operator_warmup
+runtime:
+  seed: 20260524
+  device: cpu
+  dry_run: true
+data:
+  name: synthetic
+  batch_size: 1
+  frames: 5
+  channels: 3
+  height: 24
+  width: 24
+  scale: 2.0
+model:
+  name: trajflow_vsr
+  in_channels: 3
+  out_channels: 3
+  hidden_channels: 48
+  tokenizer:
+    hidden_channels: 48
+  uncertainty:
+    hidden_channels: 48
+    degradation_dim: 8
+  transport:
+    temperature: 0.2
+    sinkhorn_iterations: 12
+    unbalanced_floor: 0.05
+    bridge_steps: 3
+    spatial_radius: 4
+    temporal_radius: 2
+  memory:
+    hidden_channels: 48
+    scan_policy: ot_sb
+    use_koopman: true
+  decoder:
+    hidden_channels: 48
+  consistency:
+    strength: 0.2
+  pretrained:
+    path: null
+    components: ["tokenizer", "uncertainty"]
+    freeze_components: []
+    strict: false
+losses:
+  charbonnier: 1.0
+  optimal_transport: 0.02
+  schrodinger_bridge: 0.01
+  koopman: 0.05
+  flow_matching: 0.0
+  data_consistency: 0.2
+  temporal: 0.1
+  wavelet_frequency: 0.1
+  anti_aliasing: 0.01
+  trajectory: 0.02
+  uncertainty: 0.0
+optimizer:
+  name: adamw
+  lr: 0.0001
+  weight_decay: 0.0001
+  max_steps: 1
+checkpoint:
+  output_dir: checkpoints/stage_b_deterministic
+  resume_path: null
+  save_every_steps: 0
+  save_final: false
+  save_history: true

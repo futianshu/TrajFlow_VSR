@@ -1,0 +1,28 @@
+base_config: configs/train/stage_d_distill.yaml
+ablation:
+  name: stage_d_distillation_grid
+  purpose: verify_consistency_distillation_and_teacher_step_quality_speed_tradeoff
+  metric_focus: ["psnr", "ssim", "temporal_delta_error", "lpips", "fps", "latency_seconds"]
+  evaluation_config: configs/eval/offline.yaml
+  common_overrides: ["checkpoint.save_final=true"]
+  evaluation_overrides: ["evaluation.save_results=true", "evaluation.posterior_samples=1"]
+  selection:
+    mode: offline
+    metrics: ["psnr", "ssim", "temporal_delta_error", "lpips", "fps"]
+    directions:
+      psnr: max
+      ssim: max
+      temporal_delta_error: min
+      lpips: min
+      fps: max
+    weights:
+      psnr: 0.30
+      ssim: 0.20
+      temporal_delta_error: 0.20
+      lpips: 0.15
+      fps: 0.15
+  variants:
+    w_o_consistency_distillation: ["losses.distillation=0.0", "losses.teacher_target=0.0"]
+    one_step_student: ["model.flow.teacher_steps=1", "losses.distillation=1.0"]
+    two_step_teacher: ["model.flow.teacher_steps=2", "losses.distillation=1.0"]
+    four_step_teacher: ["model.flow.teacher_steps=4", "losses.distillation=1.0"]

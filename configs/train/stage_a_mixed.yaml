@@ -1,0 +1,77 @@
+project:
+  name: trajflow-vsr
+  experiment: stage_a_mixed
+  output_dir: outputs/stage_a_mixed
+stage:
+  name: stage_a_tokenizer
+  mode: offline
+  objective: synthetic_real_degradation_mixed_pretraining
+runtime:
+  seed: 20260524
+  device: cpu
+  dry_run: true
+data:
+  name: stage_a_mixed
+  schedule: alternating
+  synthetic_steps: 1
+  real_steps: 1
+  synthetic_warmup_steps: 0
+  synthetic:
+    name: synthetic
+    batch_size: 1
+    frames: 5
+    channels: 3
+    height: 24
+    width: 24
+    scale: 4.0
+    degradation:
+      blur_max: 0.75
+      noise_max: 0.08
+      codec_max: 0.65
+      motion_max: 0.45
+      exposure_min: 0.75
+      exposure_max: 1.25
+      block_size: 4
+  real:
+    name: frame_manifest
+    manifest_path: data/splits/YOUR_DATASET_mild_real_x4_train_manifest.json
+    layout: generic
+    require_paired: true
+    require_degradation: true
+    batch_size: 1
+    frames: 5
+    channels: 3
+    scale: 4.0
+    clip_index: 0
+model:
+  name: trajflow_vsr
+  in_channels: 3
+  out_channels: 3
+  hidden_channels: 32
+  mask_ratio: 0.25
+  tokenizer:
+    hidden_channels: 32
+  uncertainty:
+    hidden_channels: 32
+    degradation_dim: 8
+losses:
+  masked_reconstruction: 1.0
+  degradation: 0.5
+  artifact: 0.25
+  reliability: 0.1
+  charbonnier: 0.0
+  koopman: 0.0
+  flow_matching: 0.0
+  data_consistency: 0.1
+  uncertainty: 0.1
+optimizer:
+  name: adamw
+  lr: 0.0001
+  weight_decay: 0.0
+  max_steps: 2
+checkpoint:
+  output_dir: checkpoints/stage_a_mixed
+  resume_path: null
+  save_every_steps: 0
+  save_final: false
+  save_history: true

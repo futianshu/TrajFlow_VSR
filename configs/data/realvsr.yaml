@@ -1,0 +1,23 @@
+prepare:
+  root: /home/ubuntu/data/RealVSR_dataset/LQ_test
+  output: data/splits/realvsr_test_manifest.json
+  dataset: realvsr
+  split: test
+  layout: generic
+  hr_root: /home/ubuntu/data/RealVSR_dataset/GT_test
+  hr_layout: generic
+  hr_split_file: null
+  clip_length: 50
+  stride: 50
+  min_frames: 50
+data:
+  name: frame_manifest
+  manifest_path: data/splits/realvsr_test_manifest.json
+  layout: generic
+  batch_size: 1
+  frames: 50
+  channels: 3
+  hr_height: null
+  hr_width: null
+  scale: 4.0
+  clip_index: 0

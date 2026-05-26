@@ -1,0 +1,23 @@
+prepare:
+  root: data/raw/UDM10
+  output: data/splits/udm10_test_manifest.json
+  dataset: udm10
+  split: test
+  layout: udm10
+  hr_root: null
+  hr_layout: null
+  hr_split_file: null
+  clip_length: 0
+  stride: 1
+  min_frames: 1
+data:
+  name: frame_manifest
+  manifest_path: data/splits/udm10_test_manifest.json
+  layout: udm10
+  batch_size: 1
+  frames: 0
+  channels: 3
+  hr_height: null
+  hr_width: null
+  scale: 4.0
+  clip_index: 0

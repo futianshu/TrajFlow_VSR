@@ -1,0 +1,380 @@
+registry:
+  name: core_vsr_baselines
+  purpose: track_commands_versions_weights_and_metrics_for_ccfa_vsr_baselines
+  protocol: synthetic_realistic_codec_x2_x3_x4_long_context
+  owner: TrajFlow-VSR
+baselines:
+  basicvsrpp:
+    display_name: BasicVSR++
+    category: recurrent_fidelity_vsr
+    role: fidelity_recurrent_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: BasicVSR++ reference baseline
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/basicvsrpp/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/basicvsrpp/metrics.json
+    notes: cover_x2_x3_x4_fidelity_reference
+  realbasicvsr:
+    display_name: RealBasicVSR
+    category: real_world_recurrent_vsr
+    role: real_world_degradation_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: RealBasicVSR reference baseline
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/realbasicvsr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/realbasicvsr/metrics.json
+    notes: cover_realistic_degradation_and_artifact_propagation
+  realviformer:
+    display_name: RealViformer
+    category: real_world_attention_vsr
+    role: reliability_attention_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: RealViformer attention reliability baseline
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/realviformer/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/realviformer/metrics.json
+    notes: compare_against_channel_spatial_attention_under_artifacts
+  vsrm:
+    display_name: VSRM
+    category: mamba_ssm_vsr
+    role: long_context_mamba_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Robust Mamba-based VSR reference baseline
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/vsrm/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/vsrm/metrics.json
+    notes: compare_against_plain_mamba_ssm_long_context_modeling
+  scst:
+    display_name: SCST
+    category: diffusion_mamba_real_world_vsr
+    role: diffusion_prior_with_spatiotemporal_mamba_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Self-supervised ControlNet with Spatio-Temporal Mamba baseline
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/scst/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/scst/metrics.json
+    notes: compare_against_diffusion_prior_real_world_vsr
+  diffvsr:
+    display_name: DiffVSR
+    category: diffusion_real_world_vsr
+    role: robust_diffusion_recipe_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Diffusion robust VSR recipe baseline
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/diffvsr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/diffvsr/metrics.json
+    notes: compare_quality_speed_against_multistep_diffusion_restoration
+  edvr:
+    display_name: EDVR
+    category: deformable_alignment_vsr
+    role: pcd_tsa_alignment_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: EDVR alignment baseline
+    paper_url: https://openaccess.thecvf.com/content_CVPRW_2019/papers/NTIRE/Wang_EDVR_Video_Restoration_With_Enhanced_Deformable_Convolutional_Networks_CVPRW_2019_paper.pdf
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/edvr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/edvr/metrics.json
+    notes: compare_against_deformable_alignment_for_ot_sb_ablation
+  tdan:
+    display_name: TDAN
+    category: deformable_alignment_vsr
+    role: temporal_deformable_alignment_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: TDAN feature-level alignment baseline
+    paper_url: https://openaccess.thecvf.com/content_CVPR_2020/html/Tian_TDAN_Temporally-Deformable_Alignment_Network_for_Video_Super-Resolution_CVPR_2020_paper.html
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/tdan/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/tdan/metrics.json
+    notes: compare_feature_alignment_against_probabilistic_soft_trajectory
+  mambavsr:
+    display_name: MambaVSR
+    category: mamba_ssm_vsr
+    role: content_aware_scan_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Content-aware scanning SSM VSR baseline
+    paper_url: https://arxiv.org/abs/2506.11768
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/mambavsr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/mambavsr/metrics.json
+    notes: compare_content_aware_scan_against_trajectory_conditioned_koopman_ssm
+  tsmamba:
+    display_name: TS-Mamba
+    category: mamba_ssm_online_vsr
+    role: trajectory_shifted_ssm_streaming_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Trajectory-aware shifted SSM online VSR baseline
+    paper_url: https://arxiv.org/abs/2508.10453
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/tsmamba/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/tsmamba/metrics.json
+    notes: compare_online_trajectory_shifted_scan_against_trajflow_streaming
+  videoinr:
+    display_name: VideoINR
+    category: continuous_video_representation
+    role: continuous_spacetime_arbitrary_scale_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Continuous space-time implicit video representation baseline
+    paper_url: https://arxiv.org/abs/2206.04647
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/videoinr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/videoinr/metrics.json
+    notes: compare_continuous_video_function_against_wavelet_operator_decoder
+  savsr:
+    display_name: SAVSR
+    category: arbitrary_scale_vsr
+    role: scale_adaptive_arbitrary_scale_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Scale-adaptive arbitrary-scale VSR baseline
+    paper_url: https://ojs.aaai.org/index.php/AAAI/article/view/28114
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/savsr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/savsr/metrics.json
+    notes: compare_noninteger_and_asymmetric_scale_generalization
+  stavsr:
+    display_name: ST-AVSR
+    category: arbitrary_scale_vsr
+    role: structural_textural_prior_arbitrary_scale_reference
+    priority: P0
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Structural and textural priors arbitrary-scale VSR baseline
+    paper_url: https://arxiv.org/abs/2407.09919
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/stavsr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/stavsr/metrics.json
+    notes: compare_arbitrary_scale_structure_texture_priors
+  mgldvsr:
+    display_name: MGLD-VSR
+    category: diffusion_real_world_vsr
+    role: motion_guided_latent_diffusion_reference
+    priority: P1
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Motion-guided latent diffusion real-world VSR baseline
+    paper_url: https://arxiv.org/abs/2312.00853
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/mgldvsr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/mgldvsr/metrics.json
+    notes: optional_perceptual_quality_and_temporal_consistency_reference
+  stablevsr:
+    display_name: StableVSR
+    category: diffusion_real_world_vsr
+    role: diffusion_detail_synthesis_reference
+    priority: P1
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Temporally-consistent diffusion detail synthesis baseline
+    paper_url: https://arxiv.org/abs/2311.15908
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/stablevsr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/stablevsr/metrics.json
+    notes: optional_diffusion_perceptual_quality_reference
+  upscaleavideo:
+    display_name: Upscale-A-Video
+    category: diffusion_real_world_vsr
+    role: temporal_consistent_diffusion_reference
+    priority: P1
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Temporal-consistent diffusion real-world VSR baseline
+    paper_url: https://github.com/sczhou/Upscale-A-Video
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/upscaleavideo/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/upscaleavideo/metrics.json
+    notes: optional_real_world_diffusion_visual_comparison
+  star:
+    display_name: STAR
+    category: diffusion_text_to_video_prior_vsr
+    role: text_to_video_prior_reference
+    priority: P1
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Spatial-temporal augmentation with text-to-video prior baseline
+    paper_url: https://arxiv.org/abs/2501.02976
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: /home/ubuntu/data/STAR/pretrained_weight/heavy_deg.pt
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/star/metrics.json
+    notes: local_weight_detected_but_repo_and_commands_still_required
+  ditvr:
+    display_name: DiTVR
+    category: diffusion_transformer_video_restoration
+    role: zero_shot_diffusion_transformer_reference
+    priority: P1
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Zero-shot diffusion transformer video restoration baseline
+    paper_url: https://arxiv.org/abs/2508.07811
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/ditvr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/ditvr/metrics.json
+    notes: optional_zero_shot_trajectory_aware_diffusion_transformer_reference
+  flashvsr:
+    display_name: FlashVSR
+    category: streaming_diffusion_vsr
+    role: real_time_streaming_diffusion_reference
+    priority: P1
+    status: planned
+    repo_url: TODO_OFFICIAL_REPO_URL
+    commit: TODO_COMMIT_HASH
+    paper: Real-time diffusion-based streaming VSR baseline
+    paper_url: https://arxiv.org/abs/2510.12747
+    weights:
+      source: TODO_WEIGHT_SOURCE
+      local_path: checkpoints/baselines/flashvsr/TODO.pth
+      license: TODO_LICENSE
+    commands:
+      setup: TODO_SETUP_COMMAND
+      infer: TODO_INFERENCE_COMMAND
+      evaluate: TODO_EVALUATION_COMMAND
+    metrics_path: experiments/baselines/flashvsr/metrics.json
+    notes: optional_streaming_latency_quality_curve_reference

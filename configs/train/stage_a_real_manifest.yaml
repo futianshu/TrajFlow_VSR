@@ -1,0 +1,55 @@
+project:
+  name: trajflow-vsr
+  experiment: stage_a_real_manifest
+  output_dir: outputs/stage_a_real_manifest
+stage:
+  name: stage_a_tokenizer
+  mode: offline
+  objective: real_degradation_manifest_pretraining
+runtime:
+  seed: 20260524
+  device: cpu
+  dry_run: true
+data:
+  name: frame_manifest
+  manifest_path: data/splits/YOUR_DATASET_mild_real_x4_train_manifest.json
+  layout: generic
+  require_paired: true
+  require_degradation: true
+  batch_size: 1
+  frames: 5
+  channels: 3
+  scale: 4.0
+  clip_index: 0
+model:
+  name: trajflow_vsr
+  in_channels: 3
+  out_channels: 3
+  hidden_channels: 32
+  mask_ratio: 0.25
+  tokenizer:
+    hidden_channels: 32
+  uncertainty:
+    hidden_channels: 32
+    degradation_dim: 8
+losses:
+  masked_reconstruction: 1.0
+  degradation: 0.5
+  artifact: 0.25
+  reliability: 0.1
+  charbonnier: 0.0
+  koopman: 0.0
+  flow_matching: 0.0
+  data_consistency: 0.1
+  uncertainty: 0.1
+optimizer:
+  name: adamw
+  lr: 0.0001
+  weight_decay: 0.0
+  max_steps: 1
+checkpoint:
+  output_dir: checkpoints/stage_a_real_manifest
+  resume_path: null
+  save_every_steps: 0
+  save_final: false
+  save_history: true

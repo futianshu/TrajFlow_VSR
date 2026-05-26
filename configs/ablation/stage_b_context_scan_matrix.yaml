@@ -1,0 +1,41 @@
+base_config: configs/train/stage_b_deterministic.yaml
+ablation:
+  name: stage_b_context_scan_matrix
+  purpose: measure_interaction_between_context_length_and_trajectory_scan_policy
+  metric_focus: ["psnr", "ssim", "temporal_delta_error", "fps", "latency_seconds"]
+  evaluation_config: configs/eval/offline.yaml
+  common_overrides: ["checkpoint.save_final=true", "data.height=8", "data.width=8"]
+  evaluation_overrides: ["evaluation.save_results=true"]
+  selection:
+    mode: offline
+    metrics: ["psnr", "ssim", "temporal_delta_error", "fps"]
+    directions:
+      psnr: max
+      ssim: max
+      temporal_delta_error: min
+      fps: max
+    weights:
+      psnr: 0.35
+      ssim: 0.25
+      temporal_delta_error: 0.25
+      fps: 0.15
+  matrix:
+    joiner: _x_
+    axes:
+      frames:
+        values: ["frames_3", "frames_7", "frames_15", "frames_31", "frames_63"]
+        overrides:
+          frames_3: ["data.frames=3"]
+          frames_7: ["data.frames=7"]
+          frames_15: ["data.frames=15"]
+          frames_31: ["data.frames=31"]
+          frames_63: ["data.frames=63"]
+      scan:
+        values: ["raster", "hilbert", "content", "temporal", "bridge_temporal", "ot_sb"]
+        overrides:
+          raster: ["model.memory.scan_policy=raster", "model.memory.use_koopman=true"]
+          hilbert: ["model.memory.scan_policy=hilbert", "model.memory.use_koopman=true"]
+          content: ["model.memory.scan_policy=content", "model.memory.use_koopman=true"]
+          temporal: ["model.memory.scan_policy=temporal", "model.memory.use_koopman=true"]
+          bridge_temporal: ["model.memory.scan_policy=bridge_temporal", "model.memory.use_koopman=true"]
+          ot_sb: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true"]

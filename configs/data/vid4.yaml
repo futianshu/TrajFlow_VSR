@@ -1,0 +1,23 @@
+prepare:
+  root: data/raw/Vid4
+  output: data/splits/vid4_test_manifest.json
+  dataset: vid4
+  split: test
+  layout: vid4
+  hr_root: null
+  hr_layout: null
+  hr_split_file: null
+  clip_length: 0
+  stride: 1
+  min_frames: 1
+data:
+  name: frame_manifest
+  manifest_path: data/splits/vid4_test_manifest.json
+  layout: vid4
+  batch_size: 1
+  frames: 0
+  channels: 3
+  hr_height: null
+  hr_width: null
+  scale: 4.0
+  clip_index: 0

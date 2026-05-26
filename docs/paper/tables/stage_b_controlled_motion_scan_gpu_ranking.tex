@@ -1,0 +1,14 @@
+\begin{table}[t]
+\centering
+\caption{stage\_b\_controlled\_motion\_scan\_gpu ranking}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+rank & name & selection\_score & psnr & ssim & temporal\_delta\_error & fps & latency\_seconds & profile.parameters \\
+\midrule
+1 & temporal & 0.968 & 15.49 & 0.4006 & 0.1438 & 547.9 & 0.01278 & 69620 \\
+2 & ot\_sb & 0.6322 & 15.46 & 0.3986 & 0.1442 & 523.5 & 0.01337 & 69620 \\
+3 & ot\_sb\_no\_koopman & 0.3067 & 15.28 & 0.3966 & 0.1437 & 523.1 & 0.01338 & 69620 \\
+4 & bridge\_temporal & 0.2381 & 15.35 & 0.3944 & 0.1447 & 548.7 & 0.01276 & 69620 \\
+\bottomrule
+\end{tabular}
+\end{table}

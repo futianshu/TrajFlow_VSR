@@ -1,0 +1,29 @@
+base_config: configs/train/stage_b_deterministic.yaml
+ablation:
+  name: stage_b_scan_policy_grid
+  purpose: compare_raster_hilbert_content_temporal_and_ot_sb_memory_scans
+  metric_focus: ["psnr", "ssim", "temporal_delta_error", "fps", "latency_seconds", "memory"]
+  evaluation_config: configs/eval/offline.yaml
+  common_overrides: ["checkpoint.save_final=true"]
+  evaluation_overrides: ["evaluation.save_results=true"]
+  selection:
+    mode: offline
+    metrics: ["psnr", "ssim", "temporal_delta_error", "fps"]
+    directions:
+      psnr: max
+      ssim: max
+      temporal_delta_error: min
+      fps: max
+    weights:
+      psnr: 0.4
+      ssim: 0.3
+      temporal_delta_error: 0.2
+      fps: 0.1
+  variants:
+    raster: ["model.memory.scan_policy=raster", "model.memory.use_koopman=true"]
+    hilbert: ["model.memory.scan_policy=hilbert", "model.memory.use_koopman=true"]
+    content: ["model.memory.scan_policy=content", "model.memory.use_koopman=true"]
+    temporal: ["model.memory.scan_policy=temporal", "model.memory.use_koopman=true"]
+    bridge_temporal: ["model.memory.scan_policy=bridge_temporal", "model.memory.use_koopman=true"]
+    ot_sb: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true"]
+    ot_sb_no_koopman: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=false", "losses.koopman=0.0"]
