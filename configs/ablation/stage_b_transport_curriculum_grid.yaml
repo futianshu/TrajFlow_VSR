@@ -1,0 +1,29 @@
+base_config: configs/train/stage_b_deterministic.yaml
+ablation:
+  name: stage_b_transport_curriculum_grid
+  purpose: debug_transport_plan_warmup_on_known_integer_translation
+  metric_focus: ["psnr", "ssim", "temporal_delta_error", "loss.motion_transport", "loss.transport_entropy", "fps"]
+  evaluation_config: configs/eval/offline.yaml
+  common_overrides: ["checkpoint.save_final=true", "data.name=controlled_motion", "data.motion.shift_x=2", "data.motion.shift_y=0", "data.motion.wrap=true", "data.motion.noise=0.0", "data.motion.occlusion_size=0", "data.frames=7", "data.height=24", "data.width=24", "model.hidden_channels=24", "model.transport.sinkhorn_iterations=8", "model.transport.bridge_steps=3", "optimizer.max_steps=50"]
+  evaluation_overrides: ["evaluation.save_results=true", "data.name=controlled_motion", "data.motion.shift_x=2", "data.motion.shift_y=0", "data.motion.wrap=true", "data.motion.noise=0.0", "data.motion.occlusion_size=0"]
+  selection:
+    mode: offline
+    metrics: ["psnr", "ssim", "temporal_delta_error", "fps"]
+    directions:
+      psnr: max
+      ssim: max
+      temporal_delta_error: min
+      fps: max
+    weights:
+      psnr: 0.4
+      ssim: 0.3
+      temporal_delta_error: 0.2
+      fps: 0.1
+  variants:
+    ot_sb_no_curriculum: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true", "curriculum.enabled=false"]
+    warmup_motion025_entropy001: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true", "curriculum.enabled=true", "curriculum.phases.transport_warmup.start_step=0", "curriculum.phases.transport_warmup.end_step=50", "curriculum.phases.transport_warmup.freeze_components=['decoder', 'consistency']", "curriculum.phases.transport_warmup.loss_multipliers={'charbonnier': 0.1, 'data_consistency': 0.1, 'temporal': 0.25, 'wavelet_frequency': 0.25}", "curriculum.phases.transport_warmup.loss_schedules={'motion_transport': {'start': 0.25, 'end': 0.05, 'mode': 'linear'}, 'transport_entropy': {'start': 0.01, 'end': 0.002, 'mode': 'linear'}}"]
+    warmup_motion050_entropy002: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true", "curriculum.enabled=true", "curriculum.phases.transport_warmup.start_step=0", "curriculum.phases.transport_warmup.end_step=50", "curriculum.phases.transport_warmup.freeze_components=['decoder', 'consistency']", "curriculum.phases.transport_warmup.loss_multipliers={'charbonnier': 0.1, 'data_consistency': 0.1, 'temporal': 0.25, 'wavelet_frequency': 0.25}", "curriculum.phases.transport_warmup.loss_schedules={'motion_transport': {'start': 0.5, 'end': 0.1, 'mode': 'linear'}, 'transport_entropy': {'start': 0.02, 'end': 0.004, 'mode': 'linear'}}"]
+    warmup_motion050_entropy005: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true", "curriculum.enabled=true", "curriculum.phases.transport_warmup.start_step=0", "curriculum.phases.transport_warmup.end_step=50", "curriculum.phases.transport_warmup.freeze_components=['decoder', 'consistency']", "curriculum.phases.transport_warmup.loss_multipliers={'charbonnier': 0.05, 'data_consistency': 0.05, 'temporal': 0.25, 'wavelet_frequency': 0.25}", "curriculum.phases.transport_warmup.loss_schedules={'motion_transport': {'start': 0.5, 'end': 0.1, 'mode': 'linear'}, 'transport_entropy': {'start': 0.05, 'end': 0.01, 'mode': 'linear'}}"]
+    lowtemp_radius2_warmup: ["model.memory.scan_policy=ot_sb", "model.memory.use_koopman=true", "model.transport.temperature=0.1", "model.transport.spatial_radius=2", "curriculum.enabled=true", "curriculum.phases.transport_warmup.start_step=0", "curriculum.phases.transport_warmup.end_step=50", "curriculum.phases.transport_warmup.freeze_components=['decoder', 'consistency']", "curriculum.phases.transport_warmup.loss_multipliers={'charbonnier': 0.05, 'data_consistency': 0.05, 'temporal': 0.25, 'wavelet_frequency': 0.25}", "curriculum.phases.transport_warmup.loss_schedules={'motion_transport': {'start': 0.5, 'end': 0.1, 'mode': 'linear'}, 'transport_entropy': {'start': 0.05, 'end': 0.01, 'mode': 'linear'}}"]
+    topk_warmup: ["model.memory.scan_policy=ot_sb_topk", "model.memory.trajectory_topk=4", "model.memory.use_koopman=true", "curriculum.enabled=true", "curriculum.phases.transport_warmup.start_step=0", "curriculum.phases.transport_warmup.end_step=50", "curriculum.phases.transport_warmup.freeze_components=['decoder', 'consistency']", "curriculum.phases.transport_warmup.loss_multipliers={'charbonnier': 0.1, 'data_consistency': 0.1, 'temporal': 0.25, 'wavelet_frequency': 0.25}", "curriculum.phases.transport_warmup.loss_schedules={'motion_transport': {'start': 0.5, 'end': 0.1, 'mode': 'linear'}, 'transport_entropy': {'start': 0.02, 'end': 0.004, 'mode': 'linear'}}"]
+    hard_warmup: ["model.memory.scan_policy=ot_sb_hard", "model.memory.use_koopman=true", "curriculum.enabled=true", "curriculum.phases.transport_warmup.start_step=0", "curriculum.phases.transport_warmup.end_step=50", "curriculum.phases.transport_warmup.freeze_components=['decoder', 'consistency']", "curriculum.phases.transport_warmup.loss_multipliers={'charbonnier': 0.1, 'data_consistency': 0.1, 'temporal': 0.25, 'wavelet_frequency': 0.25}", "curriculum.phases.transport_warmup.loss_schedules={'motion_transport': {'start': 0.5, 'end': 0.1, 'mode': 'linear'}, 'transport_entropy': {'start': 0.02, 'end': 0.004, 'mode': 'linear'}}"]

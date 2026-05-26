@@ -76,6 +76,13 @@ data:
         self.assertIn("bridge_temporal", config["ablation"]["variants"])
         self.assertIn("ot_sb_topk_supervised", config["ablation"]["variants"])
 
+    def test_load_stage_b_transport_curriculum_ablation_config(self):
+        config = load_config("configs/ablation/stage_b_transport_curriculum_grid.yaml")
+        self.assertEqual(config["base_config"], "configs/train/stage_b_deterministic.yaml")
+        self.assertIn("data.name=controlled_motion", config["ablation"]["common_overrides"])
+        self.assertIn("lowtemp_radius2_warmup", config["ablation"]["variants"])
+        self.assertIn("curriculum.enabled=true", config["ablation"]["variants"]["warmup_motion050_entropy002"])
+
     def test_load_stage_b_context_length_ablation_config(self):
         config = load_config("configs/ablation/stage_b_context_length_grid.yaml")
         self.assertEqual(config["base_config"], "configs/train/stage_b_deterministic.yaml")

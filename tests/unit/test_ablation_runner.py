@@ -60,6 +60,16 @@ class AblationRunnerTest(unittest.TestCase):
             "frames_3_x_content",
         ])
 
+    def test_stage_b_transport_curriculum_summary(self):
+        runner = AblationRunner(load_config("configs/ablation/stage_b_transport_curriculum_grid.yaml"))
+        summary = runner.summarize(variants=["ot_sb_no_curriculum", "lowtemp_radius2_warmup"])
+
+        self.assertEqual(summary.name, "stage_b_transport_curriculum_grid")
+        self.assertEqual(summary.runner_type, "training")
+        self.assertEqual(len(summary.variants), 2)
+        self.assertIn("curriculum.enabled=false", summary.variants[0]["overrides"])
+        self.assertIn("model.transport.temperature=0.1", summary.variants[1]["overrides"])
+
 
 if __name__ == "__main__":
     unittest.main()

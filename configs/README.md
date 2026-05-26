@@ -29,6 +29,8 @@ Stage B-E configs also expose `model.memory.scan_policy` for the Phase 1 traject
 
 Controlled-motion transport sanity runs can also enable `losses.motion_transport` and `losses.transport_entropy`. These losses are intended for transport-plan debugging or curriculum warmup on synthetic known-motion clips, not as a default Stage B reconstruction objective.
 
+Training configs may define a `curriculum` block. When `curriculum.enabled=true`, each phase can set `start_step`/`end_step`, `freeze_components`, `loss_multipliers`, `loss_overrides`, and `loss_schedules`; the runner resolves effective loss weights every step and records `curriculum_phase` plus `weight.*` entries in `history.json`.
+
 Current data entry points:
 
 - `configs/data/frame_manifest.yaml`
@@ -71,6 +73,7 @@ Current ablation entry points:
 - `configs/ablation/stage_b_context_length_grid.yaml`
 - `configs/ablation/stage_b_context_scan_matrix.yaml`
 - `configs/ablation/stage_b_controlled_motion_scan.yaml`
+- `configs/ablation/stage_b_transport_curriculum_grid.yaml`
 - `configs/ablation/stage_b_core_module_grid.yaml`
 - `configs/ablation/stage_c_flow_step_grid.yaml`
 - `configs/ablation/stage_d_distillation_grid.yaml`

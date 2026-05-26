@@ -29,6 +29,7 @@ from trajflow_vsr.training.checkpoint import (
     save_training_checkpoint,
     write_json_artifact,
 )
+from trajflow_vsr.training.curriculum import CurriculumState, TrainingCurriculum
 from trajflow_vsr.training.pretrained import load_pretrained_components, trainable_parameters
 from trajflow_vsr.utils.config import apply_overrides, load_config
 from trajflow_vsr.utils.seed import seed_everything
@@ -45,6 +46,7 @@ class RunSummary:
     data: dict[str, Any]
     model: dict[str, Any]
     losses: dict[str, Any]
+    curriculum: dict[str, Any]
     torch_available: bool
 
     def to_json(self) -> str:
@@ -71,6 +73,10 @@ class TrainingRunner:
             data=describe_data(self.config.get("data", {})),
             model=describe_model(self.config.get("model", {})),
             losses=describe_losses(self.config.get("losses", {})),
+            curriculum=TrainingCurriculum(
+                self.config.get("curriculum", {}),
+                self.config.get("losses", {}),
+            ).describe(),
             torch_available=is_torch_available(),
         )
 
@@ -102,6 +108,8 @@ class TrainingRunner:
                 degradation_spec = build_synthetic_degradation_spec(data_config)
         model = build_stage_model(self.stage, self.config.get("model", {})).to(device)
         pretrained = self._maybe_load_pretrained(model, device=device)
+        base_trainable = _parameter_trainability(model)
+        curriculum = TrainingCurriculum(self.config.get("curriculum", {}), self.config.get("losses", {}))
         parameters = trainable_parameters(model)
         if not parameters:
             raise ValueError("No trainable parameters remain after applying pretrained freeze settings")
@@ -130,9 +138,15 @@ class TrainingRunner:
         for step in range(start_step, steps):
             batch = self._make_batch(data_config, data_spec, degradation_spec, device, step=step)
             mode = self._resolve_mode(step)
+            curriculum_state = curriculum.state_for_step(step)
+            _apply_curriculum_trainability(model, base_trainable, curriculum_state.freeze_components)
             with _autocast_context(torch, device=device, enabled=use_amp):
                 outputs = self._forward(model, batch, mode=mode)
-                total_loss, loss_parts = self._compute_loss(outputs, batch)
+                total_loss, loss_parts = self._compute_loss(
+                    outputs,
+                    batch,
+                    loss_config=curriculum_state.loss_config,
+                )
                 scaled_loss = total_loss / float(accumulation_steps)
             if scaler is not None and use_amp:
                 scaler.scale(scaled_loss).backward()
@@ -164,6 +178,7 @@ class TrainingRunner:
                     if hasattr(value, "detach")
                 },
             }
+            _append_curriculum_record(record, curriculum_state)
             if "source" in batch:
                 record["data_source"] = str(batch["source"])
             history.append(record)
@@ -281,10 +296,16 @@ class TrainingRunner:
             flow_teacher_steps=int(flow_config.get("teacher_steps", 4)),
         )
 
-    def _compute_loss(self, outputs: dict[str, Any], batch: dict[str, Any]):
+    def _compute_loss(
+        self,
+        outputs: dict[str, Any],
+        batch: dict[str, Any],
+        loss_config: dict[str, Any] | None = None,
+    ):
+        losses = loss_config if loss_config is not None else self.config.get("losses", {})
         if self.stage.get("name") == "stage_a_tokenizer":
-            return compute_stage_a_loss(outputs, batch, self.config.get("losses", {}))
-        return compute_training_loss(outputs, batch, self.config.get("losses", {}))
+            return compute_stage_a_loss(outputs, batch, losses)
+        return compute_training_loss(outputs, batch, losses)
 
     def _output_dir(self) -> Path:
         return Path(self.project.get("output_dir") or "outputs/training")
@@ -482,6 +503,39 @@ def _step_manifest_config(config: dict[str, Any], step: int) -> dict[str, Any]:
         stride = int(manifest_config.get("clip_stride", 1))
         manifest_config["clip_index"] = base_index + int(step) * max(stride, 1)
     return manifest_config
+
+
+def _parameter_trainability(model) -> dict[str, bool]:
+    return {name: bool(parameter.requires_grad) for name, parameter in model.named_parameters()}
+
+
+def _apply_curriculum_trainability(
+    model,
+    base_trainable: dict[str, bool],
+    freeze_components: tuple[str, ...],
+) -> None:
+    frozen = tuple(component for component in freeze_components if component)
+    for name, parameter in model.named_parameters():
+        originally_trainable = bool(base_trainable.get(name, parameter.requires_grad))
+        parameter.requires_grad = originally_trainable and not _is_frozen_parameter(name, frozen)
+
+
+def _is_frozen_parameter(parameter_name: str, freeze_components: tuple[str, ...]) -> bool:
+    for component in freeze_components:
+        if parameter_name == component or parameter_name.startswith(f"{component}."):
+            return True
+    return False
+
+
+def _append_curriculum_record(record: dict[str, Any], state: CurriculumState) -> None:
+    if not state.enabled:
+        return
+    record["curriculum_phase"] = str(state.phase or "base")
+    record["curriculum_progress"] = float(state.progress)
+    if state.freeze_components:
+        record["curriculum_frozen"] = ",".join(state.freeze_components)
+    for key, value in state.numeric_loss_weights.items():
+        record[f"weight.{key}"] = value
 
 
 def _autocast_context(torch: Any, *, device: str, enabled: bool):
