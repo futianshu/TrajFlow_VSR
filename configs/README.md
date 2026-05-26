@@ -74,6 +74,7 @@ Current ablation entry points:
 - `configs/ablation/stage_b_context_scan_matrix.yaml`
 - `configs/ablation/stage_b_controlled_motion_scan.yaml`
 - `configs/ablation/stage_b_transport_curriculum_grid.yaml`
+- `configs/ablation/stage_b_transport_two_phase_grid.yaml`
 - `configs/ablation/stage_b_core_module_grid.yaml`
 - `configs/ablation/stage_c_flow_step_grid.yaml`
 - `configs/ablation/stage_d_distillation_grid.yaml`

@@ -83,6 +83,16 @@ data:
         self.assertIn("lowtemp_radius2_warmup", config["ablation"]["variants"])
         self.assertIn("curriculum.enabled=true", config["ablation"]["variants"]["warmup_motion050_entropy002"])
 
+    def test_load_stage_b_transport_two_phase_ablation_config(self):
+        config = load_config("configs/ablation/stage_b_transport_two_phase_grid.yaml")
+        self.assertEqual(config["base_config"], "configs/train/stage_b_deterministic.yaml")
+        self.assertIn("optimizer.max_steps=100", config["ablation"]["common_overrides"])
+        self.assertIn("two_phase25_light_recovery", config["ablation"]["variants"])
+        self.assertIn(
+            "curriculum.phases.reconstruction_recovery.start_step=25",
+            config["ablation"]["variants"]["two_phase25_light_recovery"],
+        )
+
     def test_load_stage_b_context_length_ablation_config(self):
         config = load_config("configs/ablation/stage_b_context_length_grid.yaml")
         self.assertEqual(config["base_config"], "configs/train/stage_b_deterministic.yaml")

@@ -70,6 +70,16 @@ class AblationRunnerTest(unittest.TestCase):
         self.assertIn("curriculum.enabled=false", summary.variants[0]["overrides"])
         self.assertIn("model.transport.temperature=0.1", summary.variants[1]["overrides"])
 
+    def test_stage_b_transport_two_phase_summary(self):
+        runner = AblationRunner(load_config("configs/ablation/stage_b_transport_two_phase_grid.yaml"))
+        summary = runner.summarize(variants=["lowtemp_radius2_no_curriculum_100", "two_phase25_light_recovery"])
+
+        self.assertEqual(summary.name, "stage_b_transport_two_phase_grid")
+        self.assertEqual(summary.runner_type, "training")
+        self.assertEqual(len(summary.variants), 2)
+        self.assertIn("curriculum.enabled=false", summary.variants[0]["overrides"])
+        self.assertIn("curriculum.phases.reconstruction_recovery.start_step=25", summary.variants[1]["overrides"])
+
 
 if __name__ == "__main__":
     unittest.main()

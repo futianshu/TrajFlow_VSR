@@ -102,3 +102,27 @@ Transport diagnostics:
 - `topk_warmup` / `hard_warmup` 在 plan 未充分变尖前仍主要是后处理；top-1 oracle accuracy 只到 `0.092/0.108`。
 - `lowtemp_radius2_warmup` 是本轮唯一明显改变 plan 形状的配置：entropy norm 从 `0.9960` 降到 `0.8750`，top-1 mass 从 `0.0070` 升到 `0.0479`，oracle mass 从 `0.0145` 升到 `0.0955`，top-1 oracle accuracy 到 `0.4355`。
 - 下一步应把 `temperature=0.1`、`spatial_radius=2` 作为核心，而不是只调 loss 权重；同时把 warmup 改成两阶段：短 transport pretrain 后打开 decoder/consistency reconstruction，避免低 PSNR 崩塌。
+
+## Two-Phase Follow-up
+
+入口：
+
+```bash
+uv run python scripts/run_ablation.py --config configs/ablation/stage_b_transport_two_phase_grid.yaml --output-dir outputs/ablations/stage_b_transport_two_phase_grid_gpu --set runtime.dry_run=false --set runtime.device=cuda
+```
+
+该 grid 用 100 steps 比较：
+
+- `ot_sb_no_curriculum_100`
+- `lowtemp_radius2_no_curriculum_100`
+- `two_phase10_lowtemp_radius2`
+- `two_phase25_lowtemp_radius2`
+- `two_phase25_light_recovery`
+- `two_phase25_topk_light_recovery`
+- `two_phase25_hard_light_recovery`
+
+设计意图：
+
+- 前 10 或 25 steps 用 `temperature=0.1`、`spatial_radius=2`、motion-supervised transport 和 entropy schedule 学尖锐 plan。
+- warmup 结束后解冻 decoder/consistency，并恢复 reconstruction/data-consistency 主目标。
+- `light_recovery` variants 在恢复阶段保留很弱的 motion/entropy 正则并线性衰减到 0，检查是否能保住 plan 形状而不继续压低 PSNR。
