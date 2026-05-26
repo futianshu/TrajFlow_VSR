@@ -29,6 +29,22 @@ For realistic degradation training, generate paired LR/HR manifests:
 uv run python scripts/degrade_data.py --hr-root data/raw/YOUR_HR_ROOT --lr-output-root data/processed/YOUR_DATASET_mild_real_x4 --manifest-output data/splits/YOUR_DATASET_mild_real_x4_train_manifest.json --profile mild_real --scale 4 --clip-length 7 --stride 1
 ```
 
+Local data note, 2026-05-26: the old-model datasets are mounted at
+`/home/ubuntu/data` (`/data/data`). The available assets include Vimeo90K,
+REDS4, Vid4, UDM10, SPMCS, RealVSR, VideoLQ, and codec LR variants. Vimeo90K
+uses the standard `vimeo_septuplet/sequences/<group>/<clip>/im1..im7.png`
+layout with `sep_trainlist.txt` and `sep_testlist.txt`.
+
+Pilot check before full degradation:
+
+```bash
+uv run python scripts/degrade_data.py --hr-root /home/ubuntu/data/OpenDataLab___Vimeo90K/raw/vimeo_septuplet --lr-output-root data/processed/vimeo90k_mild_real_x4_pilot --manifest-output data/splits/vimeo90k_mild_real_x4_pilot_train_manifest.json --dataset vimeo90k_mild_real_x4_pilot --split train --layout vimeo90k --sequence-glob 'sequences/00001/000[1-8]' --profile mild_real --scale 4 --clip-length 7 --stride 1 --min-frames 7 --overwrite
+```
+
+This writes an ignored local paired manifest with 8 sequences, 56 frames, and 8
+clips. The degradation manifest writer preserves `sequence_glob` for both LR
+and HR pairing, so subset pilots do not accidentally scan the full HR tree.
+
 ## 2. Stage Training
 
 Run with GPU only when the machine is free. CPU commands are for validation,
@@ -41,6 +57,18 @@ uv run python scripts/train.py --config configs/train/stage_c_rectified_flow_ful
 uv run python scripts/train.py --config configs/train/stage_d_distill_full.yaml --set runtime.dry_run=false --set runtime.device=cuda --set data.manifest_path=data/splits/YOUR_DATASET_train_manifest.json
 uv run python scripts/train.py --config configs/train/stage_e_streaming_full.yaml --set runtime.dry_run=false --set runtime.device=cuda --set data.manifest_path=data/splits/YOUR_DATASET_train_manifest.json
 ```
+
+Vimeo90K pilot GPU sanity, 2026-05-26:
+
+```bash
+uv run python scripts/train.py --config configs/train/stage_a_vimeo90k_mild_real_x4.yaml --output-dir outputs/stage_a_vimeo90k_pilot_gpu_quick --checkpoint-dir outputs/stage_a_vimeo90k_pilot_gpu_quick/checkpoints --set runtime.dry_run=false --set runtime.device=cuda --set data.manifest_path=data/splits/vimeo90k_mild_real_x4_pilot_train_manifest.json --set data.batch_size=1 --set data.frames=7 --set model.hidden_channels=24 --set model.tokenizer.hidden_channels=24 --set model.uncertainty.hidden_channels=24 --set optimizer.max_steps=20 --set optimizer.gradient_accumulation_steps=1 --set checkpoint.save_every_steps=0 --set checkpoint.save_final=true
+uv run python scripts/train.py --config configs/train/stage_b_vimeo90k_mild_real_x4.yaml --output-dir outputs/stage_b_vimeo90k_pilot_pretrained_gpu_quick --checkpoint-dir outputs/stage_b_vimeo90k_pilot_pretrained_gpu_quick/checkpoints --set runtime.dry_run=false --set runtime.device=cuda --set data.manifest_path=data/splits/vimeo90k_mild_real_x4_pilot_train_manifest.json --set data.batch_size=1 --set data.frames=7 --set data.height=24 --set data.width=24 --set model.hidden_channels=24 --set model.tokenizer.hidden_channels=24 --set model.uncertainty.hidden_channels=24 --set model.memory.hidden_channels=24 --set model.decoder.hidden_channels=24 --set model.transport.temperature=0.1 --set model.transport.spatial_radius=2 --set model.transport.sinkhorn_iterations=8 --set model.transport.bridge_steps=3 --set model.pretrained.path=outputs/stage_a_vimeo90k_pilot_gpu_quick/checkpoints/final.pt --set optimizer.max_steps=20 --set optimizer.gradient_accumulation_steps=1 --set checkpoint.save_every_steps=0 --set checkpoint.save_final=true --set validation.enabled=false
+```
+
+Pilot result: Stage A and Stage B both complete on GPU; Stage B loads 20
+tokenizer/uncertainty keys from the Stage A pilot checkpoint with no shape
+mismatch. The controlled-motion diagnostic for the Stage B pilot checkpoint is
+`top-1 mass=0.0144`, `oracle mass=0.0239`, and `top-1 oracle accuracy=0.0278`.
 
 ## 3. Internal Benchmark
 

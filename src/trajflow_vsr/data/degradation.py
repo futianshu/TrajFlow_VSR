@@ -214,9 +214,11 @@ def build_degraded_frame_dataset(
             recursive=recursive,
             min_frames=min_frames,
             layout=layout,
+            sequence_glob=sequence_glob,
             hr_root=hr_root,
             hr_layout=layout,
             hr_split_file=split_file,
+            hr_sequence_glob=sequence_glob,
             allow_unpaired=False,
         )
         manifest["degradation"] = asdict(profile)

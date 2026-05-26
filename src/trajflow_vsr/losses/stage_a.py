@@ -30,10 +30,10 @@ def compute_stage_a_loss(outputs: dict[str, Any], batch: dict[str, Any], config:
 
     artifact_weight = float(config.get("artifact", 0.5))
     if artifact_weight:
-        parts["artifact"] = functional.binary_cross_entropy(
-            outputs["uncertainty"]["artifact"].clamp(1e-5, 1.0 - 1e-5),
-            batch["artifact"].clamp(0.0, 1.0),
-        )
+        artifact_pred = outputs["uncertainty"]["artifact"].clamp(1e-5, 1.0 - 1e-5).float()
+        artifact_target = batch["artifact"].clamp(0.0, 1.0).float()
+        with torch.autocast(device_type=artifact_pred.device.type, enabled=False):
+            parts["artifact"] = functional.binary_cross_entropy(artifact_pred, artifact_target)
         total = total + artifact_weight * parts["artifact"]
 
     reliability_weight = float(config.get("reliability", 0.25))

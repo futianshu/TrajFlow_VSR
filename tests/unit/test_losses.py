@@ -11,10 +11,37 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from trajflow_vsr.losses.factory import compute_training_loss  # noqa: E402
+from trajflow_vsr.losses.stage_a import compute_stage_a_loss  # noqa: E402
 from trajflow_vsr.utils.torch_utils import require_torch  # noqa: E402
 
 
 class TrainingLossTest(unittest.TestCase):
+    def test_stage_a_artifact_bce_is_safe_under_autocast(self):
+        torch = require_torch()
+        lr = torch.rand(1, 2, 3, 4, 4)
+        outputs = {
+            "mask": torch.ones(1, 2, 1, 4, 4),
+            "reconstruction": lr,
+            "degradation": torch.rand(1, 8),
+            "uncertainty": {
+                "artifact": torch.full((1, 2, 1, 4, 4), 0.5),
+                "reliability": torch.ones(1, 2, 1, 4, 4),
+            },
+        }
+        batch = {
+            "lr": lr,
+            "clean_lr": lr,
+            "degradation": torch.rand(1, 8),
+            "artifact": torch.rand(1, 2, 1, 4, 4),
+            "reliability": torch.ones(1, 2, 1, 4, 4),
+        }
+
+        with torch.autocast(device_type="cpu", dtype=torch.bfloat16):
+            total, parts = compute_stage_a_loss(outputs, batch, {"artifact": 1.0, "masked_reconstruction": 0.0})
+
+        self.assertIn("artifact", parts)
+        self.assertGreater(float(total), 0.0)
+
     def test_data_consistency_loss_is_weighted_into_total(self):
         torch = require_torch()
         lr = torch.rand(1, 1, 3, 4, 4)

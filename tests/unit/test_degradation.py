@@ -96,6 +96,36 @@ class DegradationTest(unittest.TestCase):
             self.assertEqual(tuple(stage_a_batch["degradation"].shape), (1, 8))
             self.assertGreater(float(stage_a_batch["degradation"][0, 0]), 0.0)
 
+    def test_degraded_manifest_reuses_sequence_glob_for_hr_pairing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            hr_root = root / "hr"
+            lr_root = root / "lr"
+            manifest_path = root / "manifest.json"
+            self._write_hr_sequence(hr_root / "keep", frame_count=3)
+            self._write_hr_sequence(hr_root / "skip", frame_count=3)
+
+            summary = build_degraded_frame_dataset(
+                hr_root=hr_root,
+                lr_output_root=lr_root,
+                profile={"profile": "bicubic", "scale": 2.0},
+                manifest_output=manifest_path,
+                dataset="unit",
+                split="train",
+                sequence_glob="keep",
+                clip_length=2,
+                stride=1,
+                min_frames=2,
+                overwrite=True,
+            )
+            manifest = load_frame_manifest(manifest_path)
+
+            self.assertEqual(summary["sequences"], 1)
+            self.assertEqual(summary["clips"], 2)
+            self.assertEqual(manifest["sequence_glob"], "keep")
+            self.assertEqual(manifest["hr_sequence_glob"], "keep")
+            self.assertEqual([sequence["sequence_id"] for sequence in manifest["sequences"]], ["keep"])
+
     def test_degradation_config_template_parses(self):
         config = load_config("configs/data/degradation_mild_real.yaml")
         self.assertEqual(config["degradation"]["profile"], "mild_real")
